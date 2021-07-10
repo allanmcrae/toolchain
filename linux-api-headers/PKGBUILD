@@ -1,0 +1,35 @@
+# Maintainer: Allan McRae <allan@archlinux.org>
+
+pkgname=linux-api-headers-git
+pkgver=5.13.r12730.g50be9417e23a
+pkgrel=1
+pkgdesc='Kernel headers sanitized for use in userspace'
+arch=('any')
+url='https://www.gnu.org/software/libc'
+license=('GPL2')
+makedepends=('rsync')
+provides=('linux-api-headers')
+conflicts=('linux-api-headers')
+replaces=('linux-api-headers')
+source=('git+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git')
+sha256sums=('SKIP')
+
+pkgver() {
+  cd linux
+  git describe --long | sed "s/^v//; s/-rc/rc/; s/-/.r/; s/-/./"
+}
+
+build() {
+  cd linux
+
+  make mrproper
+  make headers_check
+}
+
+package() {
+  cd linux
+  make INSTALL_HDR_PATH="$pkgdir/usr" headers_install
+
+  # use headers from libdrm
+  rm -r "$pkgdir/usr/include/drm"
+}

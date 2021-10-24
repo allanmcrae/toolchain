@@ -1,7 +1,7 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
-pkgname=linux-api-headers-git
-pkgver=5.13.r12730.g50be9417e23a
+pkgname=linux-api-headers
+pkgver=5.14.y
 pkgrel=1
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=('any')
@@ -11,13 +11,8 @@ makedepends=('rsync')
 provides=('linux-api-headers')
 conflicts=('linux-api-headers')
 replaces=('linux-api-headers')
-source=('git+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git')
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux=$pkgver")
 sha256sums=('SKIP')
-
-pkgver() {
-  cd linux
-  git describe --long | sed "s/^v//; s/-rc/rc/; s/-/.r/; s/-/./"
-}
 
 build() {
   cd linux

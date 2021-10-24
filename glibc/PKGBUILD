@@ -1,7 +1,7 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
-pkgname=glibc-git
-pkgver=2.33.9000.r900.g28d07380c2
+pkgname=glibc
+pkgver=2.34
 pkgrel=1
 pkgdesc='GNU C Library'
 arch=('x86_64')
@@ -19,17 +19,12 @@ backup=(etc/gai.conf
         etc/nscd.conf)
 options=('!strip' 'staticlibs')
 install=glibc.install
-source=(git+https://sourceware.org/git/glibc.git
+source=("git+https://sourceware.org/git/glibc.git#branch=release/$pkgver/master"
         locale.gen.txt
         locale-gen)
 sha256sums=('SKIP'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             '83f108f915863c7ed0338e2d3e8f2e071a531a090ef8f8b2eb3a956a3c4f04d7')
-
-pkgver() {
-  cd glibc
-  git describe | sed 's/^glibc-//; s/-/.r/; s/-/./'
-}
 
 prepare() {
   mkdir -p glibc-build

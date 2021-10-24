@@ -16,9 +16,7 @@ sha256sums=('SKIP')
 
 build() {
   cd linux
-
   make mrproper
-  make headers_check
 }
 
 package() {

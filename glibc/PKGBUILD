@@ -1,0 +1,129 @@
+# Maintainer: Allan McRae <allan@archlinux.org>
+
+pkgname=glibc-git
+pkgver=2.33.9000.r900.g28d07380c2
+pkgrel=1
+pkgdesc='GNU C Library'
+arch=('x86_64')
+url='https://www.gnu.org/software/libc'
+license=('GPL' 'LGPL')
+depends=('linux-api-headers' 'tzdata')
+makedepends=('git' 'gd' 'python')
+optdepends=('perl: for mtrace'
+            'gd: graph image generation with memusage')
+provides=("glibc=${pkgver%%.r*}")
+conflicts=('glibc')
+replaces=('glibc')
+backup=(etc/gai.conf
+        etc/locale.gen
+        etc/nscd.conf)
+options=('!strip' 'staticlibs')
+install=glibc.install
+source=(git+https://sourceware.org/git/glibc.git
+        locale.gen.txt
+        locale-gen)
+sha256sums=('SKIP'
+            'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
+            '83f108f915863c7ed0338e2d3e8f2e071a531a090ef8f8b2eb3a956a3c4f04d7')
+
+pkgver() {
+  cd glibc
+  git describe | sed 's/^glibc-//; s/-/.r/; s/-/./'
+}
+
+prepare() {
+  mkdir -p glibc-build
+}
+
+build() {
+  cd glibc-build
+
+  echo "slibdir=/usr/lib" >> configparms
+  echo "rtlddir=/usr/lib" >> configparms
+  echo "sbindir=/usr/bin" >> configparms
+  echo "rootsbindir=/usr/bin" >> configparms
+
+  # remove fortify for building libraries
+  CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
+
+  "$srcdir/glibc/configure" \
+      --prefix=/usr \
+      --libdir=/usr/lib \
+      --libexecdir=/usr/lib \
+      --with-headers=/usr/include \
+      --enable-add-ons \
+      --enable-bind-now \
+      --enable-cet \
+      --enable-kernel=4.4 \
+      --enable-lock-elision \
+      --enable-multi-arch \
+      --enable-stack-protector=strong \
+      --enable-stackguard-randomization \
+      --enable-static-pie \
+      --enable-systemtap \
+      --disable-crypt \
+      --disable-profile \
+      --disable-werror
+
+  # build libraries with fortify disabled
+  echo "build-programs=no" >> configparms
+  make
+
+  # re-enable fortify for programs
+  sed -i "/build-programs=/s#no#yes#" configparms
+
+  echo "CC += -D_FORTIFY_SOURCE=2" >> configparms
+  echo "CXX += -D_FORTIFY_SOURCE=2" >> configparms
+  make
+
+  # build info pages manually for reproducibility
+  make info
+}
+
+check() {
+  cd glibc-build
+
+  # remove fortify in preparation to run test-suite
+  sed -i '/FORTIFY/d' configparms
+
+  # some failures are "expected"
+  make check || true
+}
+
+package() {
+  make -C glibc-build install_root="$pkgdir" install
+
+  # this is generated in post-install
+  rm -f "$pkgdir"/etc/ld.so.cache
+
+  # shipped in tzdata
+  rm -f "$pkgdir"/usr/bin/{tzselect,zdump,zic}
+
+  install -dm755 "$pkgdir"/usr/lib/{locale,systemd/system,tmpfiles.d}
+
+  install -m644 glibc/nscd/nscd.conf "$pkgdir"/etc/nscd.conf
+  install -m644 glibc/nscd/nscd.tmpfiles "$pkgdir"/usr/lib/tmpfiles.d/nscd.conf
+  install -m644 glibc/nscd/nscd.service "$pkgdir"/usr/lib/systemd/system/nscd.service
+
+  install -m644 glibc/posix/gai.conf "$pkgdir"/etc/gai.conf
+
+  install -m755 locale-gen "$pkgdir"/usr/bin/locale-gen
+
+  # create /etc/locale.gen
+  install -m644 "$srcdir"/locale.gen.txt "$pkgdir"/etc/locale.gen
+  sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
+    glibc/localedata/SUPPORTED >> "$pkgdir"/etc/locale.gen
+
+  if check_option 'debug' n; then
+    find "$pkgdir"/usr/bin -type f -executable -exec strip $STRIP_BINARIES {} + 2> /dev/null || true
+    find "$pkgdir"/usr/lib -name '*.a' -type f -exec strip $STRIP_STATIC {} + 2> /dev/null || true
+
+    # do not strip libraries that have symbols that are useful for gdb and valgrind functionality
+    find "$pkgdir"/usr/lib \
+      -not -name 'ld-*.so' \
+      -not -name 'libc-*.so' \
+      -not -name 'libpthread-*.so' \
+      -not -name 'libthread_db-*.so' \
+      -name '*-*.so' -type f -exec strip $STRIP_SHARED {} + 2> /dev/null || true
+  fi
+}

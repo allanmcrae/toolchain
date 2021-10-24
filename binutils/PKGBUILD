@@ -1,0 +1,78 @@
+# Maintainer: Allan McRae <allan@archlinux.org>
+
+pkgname=binutils
+pkgver=2.37
+pkgrel=1
+pkgdesc='A set of programs to assemble and manipulate binary and object files'
+arch=('x86_64')
+url='https://www.gnu.org/software/binutils/'
+license=('GPL')
+groups=('base-devel')
+depends=('glibc' 'zlib' 'libelf')
+makedepends=('git')
+checkdepends=('dejagnu' 'debuginfod' 'bc')
+optdepends=('debuginfod: for debuginfod server/client functionality')
+options=(staticlibs !distcc !ccache)
+#source=()
+source=("git+https://sourceware.org/git/binutils-gdb.git#branch=binutils-${pkgver/./_}-branch")
+sha256sums=('SKIP')
+
+
+prepare() {
+  mkdir -p binutils-build
+
+  cd binutils-gdb
+
+  # Turn off development mode (-Werror, gas run-time checks, date in sonames)
+  sed -i '/^development=/s/true/false/' bfd/development.sh
+}
+
+build() {
+  cd binutils-build
+
+  "$srcdir/binutils-gdb/configure" \
+    --prefix=/usr \
+    --with-lib-path=/usr/lib:/usr/local/lib \
+    --enable-cet \
+    --enable-deterministic-archives \
+    --enable-gold \
+    --enable-ld=default \
+    --enable-lto \
+    --enable-plugins \
+    --enable-relro \
+    --enable-shared \
+    --enable-threads \
+    --disable-gdb \
+    --disable-gdbserver \
+    --disable-libdecnumber \
+    --disable-readline \
+    --disable-sim \
+    --disable-werror \
+    --with-debuginfod \
+    --with-pic \
+    --with-system-zlib
+
+  make -O tooldir=/usr
+}
+
+check() {
+  cd binutils-build
+
+  make -k -O CFLAGS_FOR_TARGET="-g ${CFLAGS/ -fno-plt}" \
+             CXXFLAGS="${CXXFLAGS/ -fno-plt} -no-pie -fno-PIC" \
+             CFLAGS="${CFLAGS/ -fno-plt} -no-pie" \
+             LDFLAGS="" check || true
+}
+
+package() {
+  cd binutils-build
+  make -j1 prefix="$pkgdir/usr" tooldir="$pkgdir/usr" install
+
+  # Remove unwanted files
+  rm -f "$pkgdir"/usr/share/man/man1/{dlltool,windres,windmc}*
+
+  # No shared linking to these files outside binutils
+  rm -f "$pkgdir"/usr/lib/lib{bfd,opcodes}.so
+  echo 'INPUT( /usr/lib/libbfd.a -liberty -lz -ldl )' > "$pkgdir/usr/lib/libbfd.so"
+  echo 'INPUT( /usr/lib/libopcodes.a -lbfd )' > "$pkgdir/usr/lib/libopcodes.so"
+}

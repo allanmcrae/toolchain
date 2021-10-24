@@ -13,6 +13,8 @@ depends=('binutils' 'libmpc')
 makedepends=('python' 'git' 'libxcrypt')
 checkdepends=('dejagnu' 'inetutils')
 provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
+conflicts=('gcc-libs' 'gcc-fortran')
+replaces=('gcc-libs' 'gcc-fortran')
 options=('!emptydirs' 'staticlibs')
 _libdir=usr/lib/gcc/$CHOST/${pkgver%%+*}
 

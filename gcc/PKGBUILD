@@ -1,0 +1,119 @@
+# Maintainer: Allan McRae <allan@archlinux.org>
+
+pkgname=gcc
+pkgver=11.2.0
+_majorver=${pkgver%%.*}
+_islver=0.18
+pkgrel=1
+pkgdesc='The GNU Compiler Collection'
+arch=('x86_64')
+license=('GPL' 'LGPL' 'FDL' 'custom')
+url='https://gcc.gnu.org'
+depends=('binutils' 'libmpc')
+makedepends=('python' 'git' 'libxcrypt')
+checkdepends=('dejagnu' 'inetutils')
+provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
+options=('!emptydirs' 'staticlibs')
+_libdir=usr/lib/gcc/$CHOST/${pkgver%%+*}
+
+source=("git://gcc.gnu.org/git/gcc.git#branch=release/gcc-$_majorver"
+        "https://gcc.gnu.org/pub/gcc/infrastructure/isl-${_islver}.tar.bz2"
+        'c89'
+        'c99'
+        'gcc11-Wno-format-security.patch'
+)
+sha256sums=('SKIP'
+            '6b8b0fd7f81d0a957beb3679c81bbb34ccc7568d5682844d8924424a0dadcb1b'
+            'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
+            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
+            '504e4b5a08eb25b6c35f19fdbe0c743ae4e9015d0af4759e74150006c283585e')
+
+prepare() {
+  [[ ! -d gcc ]] && ln -s gcc-${pkgver/+/-} gcc
+  cd gcc
+
+  # link isl for in-tree build
+  ln -s ../isl-${_islver} isl
+
+  # Do not run fixincludes
+  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+
+  # Arch Linux installs x86_64 libraries /lib
+  sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+
+  # configure.ac: When adding -Wno-format, also add -Wno-format-security
+  patch -Np0 < "$srcdir/gcc11-Wno-format-security.patch"
+
+  mkdir -p "$srcdir/gcc-build"
+}
+
+build() {
+  cd gcc-build
+
+  # using -pipe causes spurious test-suite failures
+  # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+
+  "$srcdir/gcc/configure" --prefix=/usr \
+      --libdir=/usr/lib \
+      --libexecdir=/usr/lib \
+      --mandir=/usr/share/man \
+      --infodir=/usr/share/info \
+      --enable-languages=c,c++,fortran,lto \
+      --with-isl \
+      --with-linker-hash-style=gnu \
+      --with-system-zlib \
+      --enable-__cxa_atexit \
+      --enable-cet=auto \
+      --enable-checking=release \
+      --enable-clocale=gnu \
+      --enable-default-pie \
+      --enable-default-ssp \
+      --enable-gnu-indirect-function \
+      --enable-gnu-unique-object \
+      --enable-install-libiberty \
+      --enable-linker-build-id \
+      --enable-lto \
+      --enable-plugin \
+      --enable-shared \
+      --enable-threads=posix \
+      --disable-libssp \
+      --disable-libstdcxx-pch \
+      --disable-libunwind-exceptions \
+      --disable-werror
+
+  make -O STAGE1_CFLAGS="-O2" \
+          BOOT_CFLAGS="$CFLAGS" \
+          BOOT_LDFLAGS="$LDFLAGS" \
+          LDFLAGS_FOR_TARGET="$LDFLAGS"
+}
+
+check() {
+  cd gcc-build
+
+  # do not abort on error as some are "expected"
+  make -O -k check || true
+  "$srcdir/gcc/contrib/test_summary"
+}
+
+package() {
+  cd gcc-build
+  make DESTDIR="$pkgdir" install
+
+  # many packages expect these symlinks
+  ln -s gcc "$pkgdir"/usr/bin/cc
+  ln -s gfortran "$pkgdir/usr/bin/f95"
+
+  # POSIX conformance launcher scripts for c89 and c99
+  install -Dm755 "$srcdir/c89" "$pkgdir/usr/bin/c89"
+  install -Dm755 "$srcdir/c99" "$pkgdir/usr/bin/c99"
+
+  # byte-compile python libraries
+  python -m compileall "$pkgdir/usr/share/gcc-${pkgver%%+*}/"
+  python -O -m compileall "$pkgdir/usr/share/gcc-${pkgver%%+*}/"
+
+  # Install Runtime Library Exception
+  install -Dm644 "$srcdir/gcc/COPYING.RUNTIME" \
+    "$pkgdir/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION"
+}

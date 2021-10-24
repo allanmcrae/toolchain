@@ -11,7 +11,7 @@ makedepends=('rsync' 'git')
 provides=('linux-api-headers')
 conflicts=('linux-api-headers')
 replaces=('linux-api-headers')
-source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux=$pkgver")
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
 sha256sums=('SKIP')
 
 build() {

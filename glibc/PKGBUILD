@@ -26,6 +26,13 @@ sha256sums=('SKIP'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             '83f108f915863c7ed0338e2d3e8f2e071a531a090ef8f8b2eb3a956a3c4f04d7')
 
+unset CPPFLAGS
+CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe -fno-plt -fexceptions \
+        -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security \
+        -fstack-clash-protection -fcf-protection"
+CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
+LDFLAGS="-Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+
 prepare() {
   mkdir -p glibc-build
 }

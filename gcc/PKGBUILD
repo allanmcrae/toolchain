@@ -3,7 +3,7 @@
 pkgname=gcc
 pkgver=11.2.0
 _majorver=${pkgver%%.*}
-_islver=0.18
+_islver=0.24
 pkgrel=1
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
@@ -19,13 +19,13 @@ options=('!emptydirs' 'staticlibs')
 _libdir=usr/lib/gcc/$CHOST/${pkgver%%+*}
 
 source=("git://gcc.gnu.org/git/gcc.git#branch=release/gcc-$_majorver"
-        "https://gcc.gnu.org/pub/gcc/infrastructure/isl-${_islver}.tar.bz2"
+        "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
         'gcc11-Wno-format-security.patch'
 )
 sha256sums=('SKIP'
-            '6b8b0fd7f81d0a957beb3679c81bbb34ccc7568d5682844d8924424a0dadcb1b'
+            '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
             '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
             '504e4b5a08eb25b6c35f19fdbe0c743ae4e9015d0af4759e74150006c283585e')

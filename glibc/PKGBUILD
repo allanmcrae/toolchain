@@ -46,7 +46,7 @@ build() {
   echo "rootsbindir=/usr/bin" >> configparms
 
   # remove fortify for building libraries
-  CPPFLAGS=${CPPFLAGS/-D_FORTIFY_SOURCE=2/}
+  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}
 
   "$srcdir/glibc/configure" \
       --prefix=/usr \

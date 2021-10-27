@@ -1,7 +1,7 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
 pkgname=gcc
-pkgver=11.2.0
+pkgver=11.2.1
 _majorver=${pkgver%%.*}
 _libdir=usr/lib/gcc/$CHOST/${pkgver%%+*}
 _islver=0.24
@@ -17,7 +17,7 @@ provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
 conflicts=('gcc-libs' 'gcc-fortran')
 replaces=('gcc-libs' 'gcc-fortran')
 options=('!emptydirs' 'staticlibs')
-source=("git://gcc.gnu.org/git/gcc.git#branch=release/gcc-$_majorver"
+source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
@@ -63,6 +63,10 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
 
+  # gcc has lots of format-security "issues"
+  CFLAGS=${CXXFLAGS/-Werror=format-security}
+  CXXFLAGS=${CXXFLAGS/-Werror=format-security}
+
   "$srcdir/gcc/configure" --prefix=/usr \
       --libdir=/usr/lib \
       --libexecdir=/usr/lib \
@@ -89,6 +93,7 @@ build() {
       --disable-libssp \
       --disable-libstdcxx-pch \
       --disable-libunwind-exceptions \
+      --disable-multilib \
       --disable-werror
 
   make -O STAGE1_CFLAGS="-O2" \
@@ -118,8 +123,8 @@ package() {
   install -Dm755 "$srcdir/c99" "$pkgdir/usr/bin/c99"
 
   # byte-compile python libraries
-  python -m compileall "$pkgdir/usr/share/gcc-${pkgver%%+*}/"
-  python -O -m compileall "$pkgdir/usr/share/gcc-${pkgver%%+*}/"
+  python -m compileall "$pkgdir/usr/share/gcc-${pkgver}/"
+  python -O -m compileall "$pkgdir/usr/share/gcc-${pkgver}/"
 
   # Install Runtime Library Exception
   install -Dm644 "$srcdir/gcc/COPYING.RUNTIME" \

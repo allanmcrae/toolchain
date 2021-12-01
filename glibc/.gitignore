@@ -1,0 +1,3 @@
+glibc/
+glibc-*.pkg.*
+*.log

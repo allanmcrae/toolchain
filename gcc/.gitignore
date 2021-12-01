@@ -1,0 +1,4 @@
+gcc/
+isl-*
+gcc-*.pkg.*
+*.log

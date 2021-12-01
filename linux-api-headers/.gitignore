@@ -1,1 +1,3 @@
-linux*
+linux/
+linux-api-headers-*.pkg.*
+*.log

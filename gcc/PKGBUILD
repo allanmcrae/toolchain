@@ -16,7 +16,7 @@ checkdepends=('dejagnu' 'inetutils')
 provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
 conflicts=('gcc-libs' 'gcc-fortran')
 replaces=('gcc-libs' 'gcc-fortran')
-options=('!emptydirs' 'staticlibs')
+options=('!emptydirs' 'staticlibs' '!lto')
 source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'

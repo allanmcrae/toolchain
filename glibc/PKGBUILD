@@ -17,7 +17,7 @@ replaces=('glibc')
 backup=(etc/gai.conf
         etc/locale.gen
         etc/nscd.conf)
-options=('!strip' 'staticlibs')
+options=('!strip' 'staticlibs' '!lto')
 install=glibc.install
 source=("git+https://sourceware.org/git/glibc.git#branch=release/$pkgver/master"
         locale.gen.txt

@@ -1,7 +1,7 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
 pkgname=linux-api-headers
-pkgver=5.14.y
+pkgver=5.15.y
 pkgrel=1
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=('any')

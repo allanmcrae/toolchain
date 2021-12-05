@@ -8,9 +8,6 @@ arch=('any')
 url='https://www.gnu.org/software/libc'
 license=('GPL2')
 makedepends=('rsync' 'git')
-provides=('linux-api-headers')
-conflicts=('linux-api-headers')
-replaces=('linux-api-headers')
 source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
 sha256sums=('SKIP')
 

@@ -11,9 +11,6 @@ depends=('linux-api-headers' 'tzdata')
 makedepends=('git' 'gd' 'python')
 optdepends=('perl: for mtrace'
             'gd: graph image generation with memusage')
-provides=("glibc=${pkgver%%.r*}")
-conflicts=('glibc')
-replaces=('glibc')
 backup=(etc/gai.conf
         etc/locale.gen
         etc/nscd.conf)

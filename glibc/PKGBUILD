@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.34
-pkgrel=1
+pkgrel=2
 pkgdesc='GNU C Library'
 arch=('x86_64')
 url='https://www.gnu.org/software/libc'
@@ -38,9 +38,6 @@ build() {
   # remove fortify for building libraries
   CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}
 
-  # testsuite often uses -Wno-format - TODO: disable only for testsuite
-  echo "CC += -Wno-format-security" >> configparms
-
   "$srcdir/glibc/configure" \
       --prefix=/usr \
       --libdir=/usr/lib \
@@ -59,28 +56,46 @@ build() {
       --disable-profile \
       --disable-werror
 
-  # build libraries with fortify disabled
   echo "build-programs=no" >> configparms
-  make
+  make -O
 
   # re-enable fortify for programs
   sed -i "/build-programs=/s#no#yes#" configparms
-
-  echo "CC += -D_FORTIFY_SOURCE=2" >> configparms
-  make
+  echo "CFLAGS += -D_FORTIFY_SOURCE=2" >> configparms
+  make -O
 
   # build info pages manually for reproducibility
   make info
 }
 
+skip_test() {
+  test=$1
+  file=$2
+  sed -i "s/\b$test\b//" $srcdir/glibc/$file
+}
+
 check() {
   cd glibc-build
 
-  # remove fortify in preparation to run test-suite
-  sed -i '/FORTIFY/d' configparms
+  # adjust/remove buildflags that cause false-positive testsuite failures
+  sed -i '/FORTIFY/d' configparms					# failure to build testsuite
+  sed -i 's/-Werror=format-security/-Wformat-security/' config.make	# failure to build testsuite
+  sed -i '/CFLAGS/s/-fno-plt//' config.make				# 16 failures
+  sed -i '/CFLAGS/s/-fexceptions//' config.make				# 1 failure
+  LDFLAGS=${LDFLAGS/,-z,now/}						# 10 failures
 
-  # some failures are "expected"
-  make check || true
+  # The following tests fail due to restrictions in the Arch build system
+  # The correct fix is to add the following to the systemd-nspawn call:
+  # --capability=CAP_IPC_LOCK --system-call-filter="@clock @pkey"
+  skip_test test-errno-linux sysdeps/unix/sysv/linux/Makefile
+  skip_test tst-ntp_gettime  sysdeps/unix/sysv/linux/Makefile
+  skip_test tst-ntp_gettimex sysdeps/unix/sysv/linux/Makefile
+  skip_test tst-mlock2       sysdeps/unix/sysv/linux/Makefile
+  skip_test tst-pkey         sysdeps/unix/sysv/linux/Makefile
+  skip_test tst-adjtime      time/Makefile
+  skip_test tst-clock2       time/Makefile
+
+  make -O check
 }
 
 package() {

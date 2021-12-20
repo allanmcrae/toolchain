@@ -2,7 +2,7 @@
 
 pkgname=binutils
 pkgver=2.37
-pkgrel=1
+pkgrel=2
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=('x86_64')
 url='https://www.gnu.org/software/binutils/'
@@ -12,7 +12,7 @@ depends=('glibc' 'zlib' 'libelf')
 makedepends=('git')
 checkdepends=('dejagnu' 'debuginfod' 'bc')
 optdepends=('debuginfod: for debuginfod server/client functionality')
-options=('staticlibs' '!distcc' '!ccache' '!lto')
+options=('staticlibs' '!distcc' '!ccache')
 source=("git+https://sourceware.org/git/binutils-gdb.git#branch=binutils-${pkgver/./_}-branch")
 sha256sums=('SKIP')
 
@@ -57,10 +57,19 @@ build() {
 check() {
   cd binutils-build
 
-  make -k -O CFLAGS_FOR_TARGET="-g ${CFLAGS/ -fno-plt}" \
-             CXXFLAGS="${CXXFLAGS/ -fno-plt} -no-pie -fno-PIC" \
-             CFLAGS="${CFLAGS/ -fno-plt} -no-pie" \
-             LDFLAGS="" check || true
+  # current testsuite failure in debuginfod (objdump)
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=28029
+  sed -i '/test_fetch_debuglink $OBJDUMP/d' \
+      $srcdir/binutils-gdb/binutils/testsuite/binutils-all/debuginfod.exp
+
+  # Use minimal flags for testsuite
+  # ld testsuite uses CFLAGS_FOR_TARGET and requires -g
+  # gold testsuite requires CXXFLAGS/CFLAGS with default PIE/PIC disabled
+  make -O CFLAGS_FOR_TARGET="-O2 -g" \
+          CXXFLAGS="-O2 -no-pie -fno-PIC" \
+          CFLAGS="-O2 -no-pie" \
+          LDFLAGS="" \
+          check || true
 }
 
 package() {

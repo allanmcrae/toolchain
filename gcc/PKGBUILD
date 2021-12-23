@@ -3,9 +3,8 @@
 pkgname=gcc
 pkgver=11.2.1
 _majorver=${pkgver%%.*}
-_libdir=usr/lib/gcc/$CHOST/${pkgver%%+*}
 _islver=0.24
-pkgrel=1
+pkgrel=2
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -21,13 +20,11 @@ source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
-        'gcc11-Wno-format-security.patch'
 )
 sha256sums=('SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
-            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
-            '504e4b5a08eb25b6c35f19fdbe0c743ae4e9015d0af4759e74150006c283585e')
+            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a')
 
 prepare() {
   [[ ! -d gcc ]] && ln -s gcc-${pkgver/+/-} gcc
@@ -42,23 +39,22 @@ prepare() {
   # Arch Linux installs x86_64 libraries /lib
   sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 
-  # configure.ac: When adding -Wno-format, also add -Wno-format-security
-  patch -Np0 < "$srcdir/gcc11-Wno-format-security.patch"
-
   mkdir -p "$srcdir/gcc-build"
 }
 
 build() {
   cd gcc-build
 
-  # using -pipe causes spurious test-suite failures
-  # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
+  # TODO: properly deal with the build/testsuite issues resulting from this
+  CFLAGS=${CFLAGS/-Werror=format-security/}
+  CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
 
-  # gcc has lots of format-security "issues"
-  CFLAGS=${CXXFLAGS/-Werror=format-security}
-  CXXFLAGS=${CXXFLAGS/-Werror=format-security}
+  # TODO: check if we can only remove these when running testsuite
+  # baseline - 44 failures in gcc (on my machine...)
+  CFLAGS=${CFLAGS/-fexceptions/}		# +7 failures in gcc, +14 in libitm
+  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}	# +25 failures in libstdc++
+  CXXFLAGS="${CFLAGS}"
+  #CXXFLAGS+=" -Wp,-D_GLIBCXX_ASSERTIONS" 	# +2 failures in libstdc++
 
   "$srcdir/gcc/configure" --prefix=/usr \
       --libdir=/usr/lib \
@@ -78,13 +74,11 @@ build() {
       --enable-gnu-indirect-function \
       --enable-gnu-unique-object \
       --enable-linker-build-id \
-      --enable-lto \
       --enable-plugin \
       --enable-shared \
       --enable-threads=posix \
       --disable-libssp \
       --disable-libstdcxx-pch \
-      --disable-libunwind-exceptions \
       --disable-multilib \
       --disable-werror
 
@@ -97,7 +91,7 @@ build() {
 check() {
   cd gcc-build
 
-  # do not abort on error as some are "expected"
+  # do not abort on error as some are "expected" - gcc testsuite is brittle
   make -O -k check || true
   "$srcdir/gcc/contrib/test_summary"
 }

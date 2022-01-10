@@ -63,6 +63,8 @@ The legacy libcrypt.so.1 library is not provided by glibc.
 
 ## Known Issues
 
+There is a dependency loop between binutils and gcc.  This due to merging gcc-libs into gcc.  This can cause pacman to output multiple warnings, though has no effect on installed packages.
+
 Some of the [new buildflags](https://gitlab.archlinux.org/archlinux/rfcs/-/blob/master/rfcs/0003-buildflags.rst) cause (false positive) testsuite failures in gcc.  These are currently disabled completely, but should only be disabled during the check() phase.
 
 ## Potential Issues (that likely will not be fixed)

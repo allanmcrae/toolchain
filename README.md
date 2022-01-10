@@ -57,9 +57,13 @@ The Arch glibc package pulls systemtap support by importing headers from systemt
 
 The libiberty files were moved to the Arch gcc package about a decade ago on a temporary basis due to a bug in the binutils version.  This was never reverted. 
 
+**No libcrypt compatibility library**
+
+The legacy libcrypt.so.1 library is not provided by glibc.
+
 ## Known Issues
 
-The [new buildflags](https://gitlab.archlinux.org/archlinux/rfcs/-/blob/master/rfcs/0003-buildflags.rst) cause (false positive) testsuite failures that need fixed
+Some of the [new buildflags](https://gitlab.archlinux.org/archlinux/rfcs/-/blob/master/rfcs/0003-buildflags.rst) cause (false positive) testsuite failures in gcc.  These are currently disabled completely, but should only be disabled during the check() phase.
 
 ## Potential Issues (that likely will not be fixed)
 

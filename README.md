@@ -40,6 +40,10 @@ You can still install lib32-glibc and lib32-gcc-libs to have support for running
 
 All the gcc packages are merged into one.  Splitting packages in makepkg was built around KDE which provides nice "make" targets for the subprojects.  GCC does not.  Look at the Arch PKGBUILD to see the hassle this causes.  The makepkg maintainer should provide a better way for package splitting...
 
+**Minimum kernel version of 5.10**
+
+The Arch glibc package supports kernel version >= 4.4.  This means glibc is unable to use some optimisatons, but does allow Arch to run in more places. I will bump this two the second last LTS kernel version.
+
 **No support for Ada, D or ObjC**
 
 No-one really needs those languages anyway.

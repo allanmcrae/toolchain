@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.35
-pkgrel=0.4
+pkgrel=0.5
 pkgdesc='GNU C Library'
 arch=('x86_64')
 url='https://www.gnu.org/software/libc'
@@ -47,7 +47,7 @@ build() {
       --enable-add-ons \
       --enable-bind-now \
       --enable-cet \
-      --enable-kernel=4.4 \
+      --enable-kernel=5.10 \
       --enable-lock-elision \
       --enable-multi-arch \
       --enable-stack-protector=strong \

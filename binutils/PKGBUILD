@@ -2,7 +2,7 @@
 
 pkgname=binutils
 pkgver=2.38
-pkgrel=0.3
+pkgrel=0.4
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=('x86_64')
 url='https://www.gnu.org/software/binutils/'
@@ -13,8 +13,8 @@ makedepends=('git')
 checkdepends=('dejagnu' 'debuginfod' 'bc')
 optdepends=('debuginfod: for debuginfod server/client functionality')
 options=('staticlibs' '!distcc' '!ccache' '!lto')
-#source=("git+https://sourceware.org/git/binutils-gdb.git#branch=binutils-${pkgver/./_}-branch")
-source=("git+https://sourceware.org/git/binutils-gdb.git")
+source=("git+https://sourceware.org/git/binutils-gdb.git#branch=binutils-${pkgver/./_}-branch")
+#source=("git+https://sourceware.org/git/binutils-gdb.git")
 sha256sums=('SKIP')
 
 prepare() {
@@ -54,10 +54,9 @@ build() {
 check() {
   cd binutils-build
 
-  # current testsuite failure in debuginfod (objdump)
-  # https://sourceware.org/bugzilla/show_bug.cgi?id=28029
-  sed -i '/test_fetch_debuglink $OBJDUMP/d' \
-      $srcdir/binutils-gdb/binutils/testsuite/binutils-all/debuginfod.exp
+  # failure due to commit fdeee5d59dca41e3c70c399a939105e39a4b4282
+  # reported upstream: https://sourceware.org/pipermail/binutils/2022-January/119436.html
+  sed -i "/am__append_4/s/allocfail.sh//" libbacktrace/Makefile
 
   # Use minimal flags for testsuite
   # ld testsuite uses CFLAGS_FOR_TARGET and requires -g
@@ -66,7 +65,7 @@ check() {
           CXXFLAGS="-O2 -no-pie -fno-PIC" \
           CFLAGS="-O2 -no-pie" \
           LDFLAGS="" \
-          check || true
+          check
 }
 
 package() {

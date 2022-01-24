@@ -19,6 +19,8 @@ FAIL: gcc.dg/analyzer/pr99716-1.c (test for excess errors)
 
 ## Failures due to default SSP
 
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70230
+
 Configuring GCC with --enable-default-ssp results in these failures:
 
 ```
@@ -52,6 +54,8 @@ FAIL: gcc.target/i386/stackalign/pr88483-2.c -mstackrealign  scan-assembler-not 
 ```
 
 ## Failures due to default PIE
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
 
 Configuring GCC with --enable-default-pie results in these failures:
 

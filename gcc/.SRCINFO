@@ -1,0 +1,39 @@
+pkgbase = gcc
+	pkgdesc = The GNU Compiler Collection
+	pkgver = 11.2.1
+	pkgrel = 6
+	url = https://gcc.gnu.org
+	arch = x86_64
+	license = GPL
+	license = LGPL
+	license = FDL
+	license = custom
+	checkdepends = dejagnu
+	checkdepends = inetutils
+	makedepends = python
+	makedepends = git
+	makedepends = libxcrypt
+	depends = binutils
+	depends = libmpc
+	optdepends = mold
+	provides = gcc-libs=11.2.1
+	provides = gcc-fortran=11.2.1
+	conflicts = gcc-libs
+	conflicts = gcc-fortran
+	replaces = gcc-libs
+	replaces = gcc-fortran
+	options = !emptydirs
+	options = staticlibs
+	options = !lto
+	source = git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-11
+	source = https://libisl.sourceforge.io/isl-0.24.tar.xz
+	source = c89
+	source = c99
+	source = 0001-mold.patch
+	sha256sums = SKIP
+	sha256sums = 043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad
+	sha256sums = de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931
+	sha256sums = 2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a
+	sha256sums = 149614cb5d6c885fa30ebb0b8effe383c591221a0ba7037d938ab2aa7d1f42aa
+
+pkgname = gcc

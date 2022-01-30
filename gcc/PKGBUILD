@@ -4,7 +4,7 @@ pkgname=gcc
 pkgver=11.2.1
 _majorver=${pkgver%%.*}
 _islver=0.24
-pkgrel=5
+pkgrel=6
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -12,6 +12,7 @@ url='https://gcc.gnu.org'
 depends=('binutils' 'libmpc')
 makedepends=('python' 'git' 'libxcrypt')
 checkdepends=('dejagnu' 'inetutils')
+optdepends=('mold')
 provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
 conflicts=('gcc-libs' 'gcc-fortran')
 replaces=('gcc-libs' 'gcc-fortran')
@@ -20,11 +21,13 @@ source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
+        '0001-mold.patch'
 )
 sha256sums=('SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
-            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a')
+            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
+            '149614cb5d6c885fa30ebb0b8effe383c591221a0ba7037d938ab2aa7d1f42aa')
 
 prepare() {
   [[ ! -d gcc ]] && ln -s gcc-${pkgver/+/-} gcc
@@ -38,8 +41,11 @@ prepare() {
 
   # Arch Linux installs x86_64 libraries /lib
   sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+  # Patching Mold for GCC 11.2
+  patch -p1 "$srcdir/0001-mold.patch"
 
   mkdir -p "$srcdir/gcc-build"
+
 }
 
 build() {

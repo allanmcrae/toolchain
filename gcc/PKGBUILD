@@ -4,7 +4,7 @@ pkgname=gcc
 pkgver=11.2.1
 _majorver=${pkgver%%.*}
 _islver=0.24
-pkgrel=6
+pkgrel=7
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -16,7 +16,7 @@ provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
 conflicts=('gcc-libs' 'gcc-fortran')
 replaces=('gcc-libs' 'gcc-fortran')
 options=('!emptydirs' 'staticlibs' '!lto')
-source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
+source=("git+https://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'

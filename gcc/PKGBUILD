@@ -4,12 +4,12 @@ pkgname=gcc
 pkgver=11.2.1
 _majorver=${pkgver%%.*}
 _islver=0.24
-pkgrel=5
+pkgrel=6
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
 url='https://gcc.gnu.org'
-depends=('binutils' 'libmpc')
+depends=('libmpc')
 makedepends=('python' 'git' 'libxcrypt')
 checkdepends=('dejagnu' 'inetutils')
 provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
@@ -20,11 +20,14 @@ source=("git://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
-)
+        'fix-testsuite-default-pie.diff'
+        'fix-testsuite-default-ssp.diff')
 sha256sums=('SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
-            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a')
+            '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
+            '3f2fc47ec6c67ff080f69e0ac89e71f9374e50293b9f99a2509477c3bd4787d1'
+            'bd3ae897b0ed481acb32143f25e60f0b096bb36ab3bfea4d65197e09660da2ea')
 
 prepare() {
   [[ ! -d gcc ]] && ln -s gcc-${pkgver/+/-} gcc
@@ -39,6 +42,13 @@ prepare() {
   # Arch Linux installs x86_64 libraries /lib
   sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 
+  # TODO - submit upstream once development reopens
+  patch -p1 -i "${srcdir}"/fix-testsuite-default-pie.diff
+
+  # fix testsuite failures with default SSP
+  # upstream commit 90c31ff339015ddd89ac519656fbd23a36ee6271
+  patch -p1 -i "${srcdir}"/fix-testsuite-default-ssp.diff
+
   mkdir -p "$srcdir/gcc-build"
 }
 
@@ -50,7 +60,7 @@ build() {
   CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
 
   # TODO: check if we can only remove these when running testsuite
-  # baseline - 44 failures in gcc (on my machine...)
+  # baseline - 8 failures in gcc (on my machine...)
   CFLAGS=${CFLAGS/-fexceptions/}		# +7 failures in gcc, +14 in libitm
   CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}	# +25 failures in libstdc++
   CXXFLAGS="${CFLAGS}"

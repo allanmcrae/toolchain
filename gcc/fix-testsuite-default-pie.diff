@@ -1,0 +1,87 @@
+diff --git a/gcc/testsuite/gcc.target/i386/cet-sjlj-6a.c b/gcc/testsuite/gcc.target/i386/cet-sjlj-6a.c
+index 040b297aeb0..1e59aec371e 100644
+--- a/gcc/testsuite/gcc.target/i386/cet-sjlj-6a.c
++++ b/gcc/testsuite/gcc.target/i386/cet-sjlj-6a.c
+@@ -2,8 +2,8 @@
+ /* { dg-require-effective-target maybe_x32 } */
+ /* { dg-options "-O -maddress-mode=short -fcf-protection -mx32" } */
+ /* { dg-final { scan-assembler-times "endbr64" 2 } } */
+-/* { dg-final { scan-assembler-times "movq\t.*buf\\+8" 1 } } */
+-/* { dg-final { scan-assembler-times "subq\tbuf\\+8" 1 } } */
++/* { dg-final { scan-assembler-times "movq\t.*buf\\+8" 1 { target { ! pie_enabled } } } } */
++/* { dg-final { scan-assembler-times "subq\tbuf\\+8" 1 { target { ! pie_enabled } } } } */
+ /* { dg-final { scan-assembler-times "shrl\t\\\$3," 1 } } */
+ /* { dg-final { scan-assembler-times "rdsspq" 2 } } */
+ /* { dg-final { scan-assembler-times "incsspq" 2 } } */
+diff --git a/gcc/testsuite/gcc.target/i386/cet-sjlj-6b.c b/gcc/testsuite/gcc.target/i386/cet-sjlj-6b.c
+index b2376e710df..1aa39a5ac08 100644
+--- a/gcc/testsuite/gcc.target/i386/cet-sjlj-6b.c
++++ b/gcc/testsuite/gcc.target/i386/cet-sjlj-6b.c
+@@ -2,8 +2,8 @@
+ /* { dg-require-effective-target maybe_x32 } */
+ /* { dg-options "-O -maddress-mode=long -fcf-protection -mx32" } */
+ /* { dg-final { scan-assembler-times "endbr64" 2 } } */
+-/* { dg-final { scan-assembler-times "movq\t.*buf\\+16" 1 } } */
+-/* { dg-final { scan-assembler-times "subq\tbuf\\+16" 1 } } */
++/* { dg-final { scan-assembler-times "movq\t.*buf\\+16" 1 { target { ! pie_enabled } } } } */
++/* { dg-final { scan-assembler-times "subq\tbuf\\+16" 1 { target { ! pie_enabled } } } } */
+ /* { dg-final { scan-assembler-times "shrl\t\\\$3," 1 } } */
+ /* { dg-final { scan-assembler-times "rdsspq" 2 } } */
+ /* { dg-final { scan-assembler-times "incsspq" 2 } } */
+diff --git a/gcc/testsuite/gcc.target/i386/fentryname3.c b/gcc/testsuite/gcc.target/i386/fentryname3.c
+index bd7c997c178..985a00cf7c9 100644
+--- a/gcc/testsuite/gcc.target/i386/fentryname3.c
++++ b/gcc/testsuite/gcc.target/i386/fentryname3.c
+@@ -3,7 +3,7 @@
+ /* { dg-require-profiling "-pg" } */
+ /* { dg-options "-pg -mfentry"  } */
+ /* { dg-final { scan-assembler "section.*__entry_loc" } } */
+-/* { dg-final { scan-assembler "0x0f, 0x1f, 0x44, 0x00, 0x00" } } */
++/* { dg-final { scan-assembler "0x0f, 0x1f, 0x44, 0x00, 0x00" { target { ! pie_enabled } } } } */
+ /* { dg-final { scan-assembler-not "__fentry__" } } */
+ 
+ __attribute__((fentry_name("nop"), fentry_section("__entry_loc")))
+diff --git a/gcc/testsuite/gcc.target/i386/pr24414.c b/gcc/testsuite/gcc.target/i386/pr24414.c
+index 0acaa001a5c..3bc4a7ce7b2 100644
+--- a/gcc/testsuite/gcc.target/i386/pr24414.c
++++ b/gcc/testsuite/gcc.target/i386/pr24414.c
+@@ -1,5 +1,6 @@
+ /* { dg-do run } */
+ /* { dg-options "-O2" } */
++/* { dg-additional-options "-no-pie" { target pie_enabled } } */
+ /* { dg-skip-if "asm insert mismatches ABI for Darwin" { *-*-darwin* } } */
+ int test;
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/pr93492-3.c b/gcc/testsuite/gcc.target/i386/pr93492-3.c
+index 52a19e51513..a34b0c7cf10 100644
+--- a/gcc/testsuite/gcc.target/i386/pr93492-3.c
++++ b/gcc/testsuite/gcc.target/i386/pr93492-3.c
+@@ -10,4 +10,4 @@ f10_endbr (void)
+ {
+ }
+ 
+-/* { dg-final { scan-assembler "\t\.cfi_startproc\n\tendbr(32|64)\n.*\.LPFE1:\n\tnop\n1:\tcall\t__fentry__\n\tret\n" } } */
++/* { dg-final { scan-assembler "\t\.cfi_startproc\n\tendbr(32|64)\n.*\.LPFE1:\n\tnop\n1:\tcall\t__fentry__\n\tret\n" { target { ! pie_enabled } } } } */
+diff --git a/gcc/testsuite/gcc.target/i386/pr93492-5.c b/gcc/testsuite/gcc.target/i386/pr93492-5.c
+index fcf4ad43aa2..1c8efdf051c 100644
+--- a/gcc/testsuite/gcc.target/i386/pr93492-5.c
++++ b/gcc/testsuite/gcc.target/i386/pr93492-5.c
+@@ -8,4 +8,4 @@ foo (void)
+ {
+ }
+ 
+-/* { dg-final { scan-assembler "\t\.cfi_startproc\n.*\.LPFE1:\n\tnop\n1:\tcall\t__fentry__\n\tret\n" } } */
++/* { dg-final { scan-assembler "\t\.cfi_startproc\n.*\.LPFE1:\n\tnop\n1:\tcall\t__fentry__\n\tret\n" { target { ! pie_enabled } } } } */
+diff --git a/gcc/testsuite/gcc.target/i386/pr98482-1.c b/gcc/testsuite/gcc.target/i386/pr98482-1.c
+index 912cbe09191..0af9575b954 100644
+--- a/gcc/testsuite/gcc.target/i386/pr98482-1.c
++++ b/gcc/testsuite/gcc.target/i386/pr98482-1.c
+@@ -1,7 +1,7 @@
+ /* { dg-do compile { target { *-*-linux* && lp64 } } } */
+ /* { dg-require-effective-target mfentry } */
+ /* { dg-options "-fprofile -mfentry -O2 -mcmodel=large" } */
+-/* { dg-final { scan-assembler "movabsq\t\\\$__fentry__, %r10\n\tcall\t\\*%r10" } } */
++/* { dg-final { scan-assembler "movabsq\t\\\$__fentry__, %r10\n\tcall\t\\*%r10" { target { ! pie_enabled } } } } */
+ 
+ void
+ func (void)

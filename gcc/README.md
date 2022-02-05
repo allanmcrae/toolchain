@@ -1,10 +1,18 @@
 # GCC testsuite failures
 
-The GCC testsuite currently shows 44 failures.  It would be good to investigate these in more detail and ensure fixes are made (either here or upstream), or incompatibilities formally noted.
+The GCC testsuite currently shows 0 failures!  
 
-## Analyzer failures due to glibc-2.34+ incompatibility
+## Buildflag failures
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101081
+There are still failures if we enable various build flags. It would be good to investigate these in more detail and ensure fixes are made (either here or upstream), or incompatibilities formally noted - details in the PKGBUILD.
+
+## Fixed testsuite issues
+
+The PKGBUILD currently patches the testsuite to fix the following failures
+
+### Analyzer failures due to glibc-2.34+ incompatibility
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101081 - patch posted upstream
 
 ```
 FAIL: gcc.dg/analyzer/analyzer-verbosity-2a.c (test for excess errors)
@@ -17,9 +25,9 @@ FAIL: gcc.dg/analyzer/file-pr58237.c (test for excess errors)
 FAIL: gcc.dg/analyzer/pr99716-1.c (test for excess errors)
 ```
 
-## Failures due to default SSP
+### Failures due to default SSP
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70230
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70230 - patch accepted upstream
 
 Configuring GCC with --enable-default-ssp results in these failures:
 
@@ -53,9 +61,9 @@ FAIL: gcc.target/i386/stackalign/pr88483-2.c -mno-stackrealign  scan-assembler-n
 FAIL: gcc.target/i386/stackalign/pr88483-2.c -mstackrealign  scan-assembler-not and[lq]?[^\\\\n]*-[0-9]+,[^\\\\n]*sp
 ```
 
-## Failures due to default PIE
+### Failures due to default PIE
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150 - submit patch to mailing list
 
 Configuring GCC with --enable-default-pie results in these failures:
 

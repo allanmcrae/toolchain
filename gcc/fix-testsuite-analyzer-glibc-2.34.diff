@@ -1,0 +1,123 @@
+diff --git a/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-2a.c b/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-2a.c
+index 9faf5da3a4f..cf014b0a3c8 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-2a.c
++++ b/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-2a.c
+@@ -1,6 +1,9 @@
+ /* { dg-additional-options "-fanalyzer-verbosity=2" } */
+ 
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
+ 
+ extern int foo ();
+ extern void bar ();
+diff --git a/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-3a.c b/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-3a.c
+index 1b2b7983624..b0ece203f56 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-3a.c
++++ b/gcc/testsuite/gcc.dg/analyzer/analyzer-verbosity-3a.c
+@@ -1,6 +1,9 @@
+ /* { dg-additional-options "-fanalyzer-verbosity=3" } */
+ 
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
+ 
+ extern int foo ();
+ extern void bar ();
+diff --git a/gcc/testsuite/gcc.dg/analyzer/edges-1.c b/gcc/testsuite/gcc.dg/analyzer/edges-1.c
+index 6b53ddddc05..f08a6143d59 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/edges-1.c
++++ b/gcc/testsuite/gcc.dg/analyzer/edges-1.c
+@@ -1,4 +1,7 @@
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
+ 
+ extern int foo ();
+ extern void bar ();
+diff --git a/gcc/testsuite/gcc.dg/analyzer/file-1.c b/gcc/testsuite/gcc.dg/analyzer/file-1.c
+index 0f4bc5aa7af..e8d934331fd 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/file-1.c
++++ b/gcc/testsuite/gcc.dg/analyzer/file-1.c
+@@ -1,4 +1,9 @@
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
++#define SEEK_SET        0
++int fseek (FILE *, long int, int);
+ 
+ void
+ test_1 (const char *path)
+diff --git a/gcc/testsuite/gcc.dg/analyzer/file-2.c b/gcc/testsuite/gcc.dg/analyzer/file-2.c
+index 8d34c739084..9c58108a531 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/file-2.c
++++ b/gcc/testsuite/gcc.dg/analyzer/file-2.c
+@@ -1,4 +1,7 @@
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
+ 
+ struct foo
+ {
+diff --git a/gcc/testsuite/gcc.dg/analyzer/file-paths-1.c b/gcc/testsuite/gcc.dg/analyzer/file-paths-1.c
+index d346f7a7c9a..f35017835d4 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/file-paths-1.c
++++ b/gcc/testsuite/gcc.dg/analyzer/file-paths-1.c
+@@ -1,6 +1,13 @@
+ /* { dg-additional-options "-fanalyzer-verbosity=3" } */
+ 
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
++char *fgets (char *, int, FILE *);
++
++#define NULL ((void *)0)
++
+ 
+ /* Verify that we correctly emit CFG events in the face of buffers
+    being clobbered in these leak reports.  */
+diff --git a/gcc/testsuite/gcc.dg/analyzer/file-pr58237.c b/gcc/testsuite/gcc.dg/analyzer/file-pr58237.c
+index 68f49c25607..ecc7144198b 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/file-pr58237.c
++++ b/gcc/testsuite/gcc.dg/analyzer/file-pr58237.c
+@@ -1,4 +1,10 @@
+-#include <stdio.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
++char *fgets (char *, int, FILE *);
++
++#define NULL ((void *)0)
+ 
+ void f0(const char *str)
+ {
+diff --git a/gcc/testsuite/gcc.dg/analyzer/pr99716-1.c b/gcc/testsuite/gcc.dg/analyzer/pr99716-1.c
+index 6720c3c198b..2ccdcc73a5c 100644
+--- a/gcc/testsuite/gcc.dg/analyzer/pr99716-1.c
++++ b/gcc/testsuite/gcc.dg/analyzer/pr99716-1.c
+@@ -1,5 +1,10 @@
+-#include <stdio.h>
+-#include <stdlib.h>
++typedef struct FILE   FILE;
++
++FILE* fopen (const char*, const char*);
++int   fclose (FILE*);
++int fprintf (FILE *, const char *, ...);
++
++#define NULL ((void *)0)
+ 
+ void
+ test_1 (void)

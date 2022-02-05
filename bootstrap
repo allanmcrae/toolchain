@@ -1,0 +1,23 @@
+repo=$1
+
+if [[ -z "$repo" ]]; then
+  echo "Usage: ./bootstrap <repo>"
+  exit
+fi
+
+build() {
+  pushd $1
+  shift
+  sudo makechrootpkg -r /var/lib/archbuild/${repo}-x86_64/ -- -i -r $@
+  popd
+}
+
+${repo}-x86_64-build -c
+build linux-api-headers
+build glibc --nocheck
+build binutils --nocheck
+build gcc --nocheck
+build glibc 
+build binutils
+build gcc
+

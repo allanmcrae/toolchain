@@ -54,10 +54,6 @@ build() {
 check() {
   cd binutils-build
 
-  # failure due to commit fdeee5d59dca41e3c70c399a939105e39a4b4282
-  # reported upstream: https://sourceware.org/pipermail/binutils/2022-January/119436.html
-  sed -i "/am__append_4/s/allocfail.sh//" libbacktrace/Makefile
-
   # Use minimal flags for testsuite
   # ld testsuite uses CFLAGS_FOR_TARGET and requires -g
   # gold testsuite requires CXXFLAGS/CFLAGS with default PIE/PIC disabled

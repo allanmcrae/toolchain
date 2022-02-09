@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.35
-pkgrel=1
+pkgrel=2
 pkgdesc='GNU C Library'
 arch=('x86_64')
 url='https://www.gnu.org/software/libc'
@@ -16,8 +16,8 @@ backup=(etc/gai.conf
         etc/nscd.conf)
 options=('!strip' 'staticlibs' '!lto')
 install=glibc.install
-#source=("git+https://sourceware.org/git/glibc.git#branch=release/$pkgver/master"
-source=("git+https://sourceware.org/git/glibc.git"
+source=("git+https://sourceware.org/git/glibc.git#branch=release/$pkgver/master"
+#source=("git+https://sourceware.org/git/glibc.git"
         locale.gen.txt
         locale-gen)
 sha256sums=('SKIP'

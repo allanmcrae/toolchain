@@ -27,7 +27,8 @@ sha256sums=('SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
             '2513c6d9984dd0a2058557bf00f06d8d5181734e41dcfe07be7ed86f2959622a'
-            '3f2fc47ec6c67ff080f69e0ac89e71f9374e50293b9f99a2509477c3bd4787d1')
+            '3f2fc47ec6c67ff080f69e0ac89e71f9374e50293b9f99a2509477c3bd4787d1'
+            '425f678653842d890b46a5d27b246937f77a3559c5e60e3eabd21e878f29af39')
 
 prepare() {
   [[ ! -d gcc ]] && ln -s gcc-${pkgver/+/-} gcc

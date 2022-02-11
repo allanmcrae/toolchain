@@ -21,7 +21,8 @@ source=("git+https://gcc.gnu.org/git/gcc.git"
         "https://libisl.sourceforge.io/isl-${_islver}.tar.xz"
         'c89'
         'c99'
-        'fix-testsuite-default-pie.diff')
+        'fix-testsuite-default-pie.diff'
+        'mold-lto-plugin.patch')
 sha256sums=('SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'de48736f6e4153f03d0a5d38ceb6c6fdb7f054e8f47ddd6af0a3dbf14f27b931'
@@ -43,6 +44,8 @@ prepare() {
 
   # TODO - submit upstream
   patch -p1 -i "${srcdir}"/fix-testsuite-default-pie.diff
+
+  patch -Np1 < "${srcdir}"/mold-lto-plugin.patch
 
   mkdir -p "$srcdir/gcc-build"
 }

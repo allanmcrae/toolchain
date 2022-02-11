@@ -1,0 +1,255 @@
+From 76f10e938b79e87c2890e16ffcc350af0ec5e1b9 Mon Sep 17 00:00:00 2001
+From: Martin Liska <mliska@suse.cz>
+Date: Tue, 4 Jan 2022 16:37:13 +0100
+Subject: [PATCH] Add new hook ld_plugin_register_open_and_read_symbols.
+
+The hook can be used for parsing of symbol table while
+the file is not claimed.
+---
+ include/plugin-api.h    | 19 ++++++++-
+ lto-plugin/lto-plugin.c | 88 ++++++++++++++++++++++++++++++-----------
+ 2 files changed, 83 insertions(+), 24 deletions(-)
+
+diff --git a/include/plugin-api.h b/include/plugin-api.h
+index 4e12c0320d6..1a8bd4334bf 100644
+--- a/include/plugin-api.h
++++ b/include/plugin-api.h
+@@ -260,7 +260,14 @@ enum ld_plugin_status
+ (*ld_plugin_claim_file_handler) (
+   const struct ld_plugin_input_file *file, int *claimed);
+ 
+-/* The plugin library's "all symbols read" handler.  */
++/* The plugin library's "parse symbols for file" handler.  */
++
++typedef
++bool
++(*ld_plugin_open_and_read_symbols_handler) (
++  const struct ld_plugin_input_file *file);
++
++/* The plugin library's "read all symbols" handler.  */
+ 
+ typedef
+ enum ld_plugin_status
+@@ -278,6 +285,12 @@ typedef
+ enum ld_plugin_status
+ (*ld_plugin_register_claim_file) (ld_plugin_claim_file_handler handler);
+ 
++/* The linker's interface for registering the "read all symbols" handler.  */
++
++typedef
++enum ld_plugin_status
++(*ld_plugin_register_open_and_read_symbols) (ld_plugin_open_and_read_symbols_handler handler);
++
+ /* The linker's interface for registering the "all symbols read" handler.  */
+ 
+ typedef
+@@ -520,7 +533,8 @@ enum ld_plugin_tag
+   LDPT_GET_INPUT_SECTION_SIZE = 30,
+   LDPT_REGISTER_NEW_INPUT_HOOK = 31,
+   LDPT_GET_WRAP_SYMBOLS = 32,
+-  LDPT_ADD_SYMBOLS_V2 = 33
++  LDPT_ADD_SYMBOLS_V2 = 33,
++  LDPT_REGISTER_OPEN_AND_READ_SYMBOLS = 34
+ };
+ 
+ /* The plugin transfer vector.  */
+@@ -556,6 +570,7 @@ struct ld_plugin_tv
+     ld_plugin_get_input_section_size tv_get_input_section_size;
+     ld_plugin_register_new_input tv_register_new_input;
+     ld_plugin_get_wrap_symbols tv_get_wrap_symbols;
++    ld_plugin_register_open_and_read_symbols tv_register_open_and_read_symbols;
+   } tv_u;
+ };
+ 
+diff --git a/lto-plugin/lto-plugin.c b/lto-plugin/lto-plugin.c
+index c9c048d3631..c6be94cea5f 100644
+--- a/lto-plugin/lto-plugin.c
++++ b/lto-plugin/lto-plugin.c
+@@ -165,6 +165,7 @@ static ld_plugin_add_input_file add_input_file;
+ static ld_plugin_add_input_library add_input_library;
+ static ld_plugin_message message;
+ static ld_plugin_add_symbols add_symbols, add_symbols_v2;
++static ld_plugin_register_open_and_read_symbols register_open_and_read_symbols;
+ 
+ static struct plugin_file_info *claimed_files = NULL;
+ static unsigned int num_claimed_files = 0;
+@@ -1139,12 +1140,14 @@ process_offload_section (void *data, const char *name, off_t offset, off_t len)
+   return 1;
+ }
+ 
+-/* Callback used by gold to check if the plugin will claim FILE. Writes
+-   the result in CLAIMED. */
++/* Check file and read symbol table for FILE.  If CLAIM_FILE is true, then
++   register the file the claimed objects.  */
+ 
+-static enum ld_plugin_status
+-claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
++static bool
++check_file_and_read_symbol_table (const struct ld_plugin_input_file *file,
++				  bool claim_file)
+ {
++  bool contains_symbols = false;
+   enum ld_plugin_status status;
+   struct plugin_objfile obj;
+   struct plugin_file_info lto_file;
+@@ -1172,14 +1175,13 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+     }
+   lto_file.handle = file->handle;
+ 
+-  *claimed = 0;
+   obj.file = file;
+   obj.found = 0;
+   obj.offload = 0;
+   obj.out = &lto_file.symtab;
+   errmsg = NULL;
+   obj.objfile = simple_object_start_read (file->fd, file->offset, LTO_SEGMENT_NAME,
+-			&errmsg, &err);
++					  &errmsg, &err);
+   /* No file, but also no error code means unrecognized format; just skip it.  */
+   if (!obj.objfile && !err)
+     goto err;
+@@ -1203,7 +1205,7 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+     {
+       if (err && message)
+ 	message (LDPL_FATAL, "%s: %s: %s", file->name, errmsg,
+-		xstrerror (err));
++		 xstrerror (err));
+       else if (message)
+ 	message (LDPL_FATAL, "%s: %s", file->name, errmsg);
+       goto err;
+@@ -1229,13 +1231,16 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+ 			      lto_file.symtab.syms);
+       check (status == LDPS_OK, LDPL_FATAL, "could not add symbols");
+ 
+-      num_claimed_files++;
+-      claimed_files =
+-	xrealloc (claimed_files,
+-		  num_claimed_files * sizeof (struct plugin_file_info));
+-      claimed_files[num_claimed_files - 1] = lto_file;
++      if (claim_file)
++	{
++	  num_claimed_files++;
++	  claimed_files
++	     = xrealloc (claimed_files,
++			 num_claimed_files * sizeof (struct plugin_file_info));
++	  claimed_files[num_claimed_files - 1] = lto_file;
++	}
+ 
+-      *claimed = 1;
++      contains_symbols = true;
+     }
+ 
+   if (offload_files == NULL)
+@@ -1250,7 +1255,7 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+   /* If this is an LTO file without offload, and it is the first LTO file, save
+      the pointer to the last offload file in the list.  Further offload LTO
+      files will be inserted after it, if any.  */
+-  if (*claimed && obj.offload == 0 && offload_files_last_lto == NULL)
++  if (contains_symbols && obj.offload == 0 && offload_files_last_lto == NULL)
+     offload_files_last_lto = offload_files_last;
+ 
+   if (obj.offload == 1)
+@@ -1264,8 +1269,8 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+       ofld->name = lto_file.name;
+       ofld->next = NULL;
+ 
+-      if (*claimed && offload_files_last_lto == NULL && file->offset != 0
+-	  && gold_version == -1)
++      if (contains_symbols && offload_files_last_lto == NULL
++	  && file->offset != 0 && gold_version == -1)
+ 	{
+ 	  /* ld only: insert first LTO file from the archive after the last real
+ 	     object file immediately preceding the archive, or at the begin of
+@@ -1281,7 +1286,7 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+ 	      offload_files->next = ofld;
+ 	    }
+ 	}
+-      else if (*claimed && offload_files_last_lto != NULL)
++      else if (offload_files_last_lto != NULL)
+ 	{
+ 	  /* Insert LTO file after the last LTO file in the list.  */
+ 	  ofld->next = offload_files_last_lto->next;
+@@ -1296,7 +1301,7 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+ 	offload_files_last = ofld;
+       if (file->offset == 0)
+ 	offload_files_last_obj = ofld;
+-      if (*claimed)
++      if (contains_symbols)
+ 	offload_files_last_lto = ofld;
+       num_offload_files++;
+     }
+@@ -1311,9 +1316,29 @@ claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
+   if (obj.objfile)
+     simple_object_release_read (obj.objfile);
+ 
++  return contains_symbols;
++}
++
++/* Callback used by gold to check if the plugin will claim FILE.
++   Writes the result in CLAIMED.  */
++
++static enum ld_plugin_status
++claim_file_handler (const struct ld_plugin_input_file *file, int *claimed)
++{
++  bool contains_symbols = check_file_and_read_symbol_table (file, true);
++  *claimed = contains_symbols;
++
+   return LDPS_OK;
+ }
+ 
++/* Callback used by mold to check if the FILE contains LTO symbols.  */
++
++static bool
++open_and_read_symbols (const struct ld_plugin_input_file *file)
++{
++  return check_file_and_read_symbol_table (file, false);
++}
++
+ /* Parse the plugin options. */
+ 
+ static void
+@@ -1393,6 +1418,10 @@ onload (struct ld_plugin_tv *tv)
+ 	case LDPT_REGISTER_CLAIM_FILE_HOOK:
+ 	  register_claim_file = p->tv_u.tv_register_claim_file;
+ 	  break;
++	case LDPT_REGISTER_OPEN_AND_READ_SYMBOLS:
++	  register_open_and_read_symbols
++	    = p->tv_u.tv_register_open_and_read_symbols;
++	  break;
+ 	case LDPT_ADD_SYMBOLS_V2:
+ 	  add_symbols_v2 = p->tv_u.tv_add_symbols;
+ 	  break;
+@@ -1437,11 +1466,26 @@ onload (struct ld_plugin_tv *tv)
+       p++;
+     }
+ 
+-  check (register_claim_file, LDPL_FATAL, "register_claim_file not found");
+   check (add_symbols, LDPL_FATAL, "add_symbols not found");
+-  status = register_claim_file (claim_file_handler);
+-  check (status == LDPS_OK, LDPL_FATAL,
+-	 "could not register the claim_file callback");
++
++  if (register_claim_file != NULL)
++    {
++      status = register_claim_file (claim_file_handler);
++      check (status == LDPS_OK, LDPL_FATAL,
++	     "could not register the claim_file callback");
++    }
++  else if (register_open_and_read_symbols != NULL)
++    {
++      status = register_open_and_read_symbols (open_and_read_symbols);
++      check (status == LDPS_OK, LDPL_FATAL,
++	     "could not register the open_and_read_symbols callback");
++    }
++  else
++    {
++      fprintf (stderr,
++	       "either claim_file or open_and_read_symbols must be registered");
++      abort ();
++    }
+ 
+   if (register_cleanup)
+     {
+-- 
+2.27.0
+

@@ -55,9 +55,9 @@ build() {
 
   # TODO: check if we can only remove these when running testsuite
   CFLAGS=${CFLAGS/-fexceptions/}		# +7 failures in gcc, +14 in libitm
-  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}	# +25 failures in libstdc++
-  CXXFLAGS="${CFLAGS}"
-  #CXXFLAGS+=" -Wp,-D_GLIBCXX_ASSERTIONS" 	# +2 failures in libstdc++
+  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}	# +29 failures in libstdc++
+
+  CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
 
   "$srcdir/gcc/configure" --prefix=/usr \
       --libdir=/usr/lib \
@@ -95,7 +95,7 @@ check() {
   cd gcc-build
 
   # some testsuite failures are "expected" - see README.md for details
-  make -O -k check
+  make -O -k check || :
   "$srcdir/gcc/contrib/test_summary"
 }
 

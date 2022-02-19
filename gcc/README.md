@@ -118,10 +118,23 @@ FAIL: gfortran.dg/unlimited_polymorphic_3.f03   -Os  execution test
 ```
 
 ### Upstream regression #3
+https://gcc.gnu.org/pipermail/gcc-patches/2022-February/590571.html
+```
+FAIL: gcc.dg/deprecated.c  (test for warnings, line 28)
+FAIL: gcc.dg/deprecated.c (test for excess errors)
+```
+
+### Upstream regression #4
+https://gcc.gnu.org/pipermail/gcc-patches/2022-February/590443.html
+```
+FAIL: gcc.target/i386/auto-init-4.c scan-assembler-times long\\t-16843010 5
+```
+
+### Upstream regression #5
 Needs investigating
 ```
-UNRESOLVED: gcc.target/i386/pr35513-8.c scan-assembler .long[ \\t]+0xb0008000
-UNRESOLVED: gcc.target/i386/pr35513-8.c scan-assembler .section[ \\t]+.note.gnu.property,
+FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 80)
+FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 84)
 ```
 
 ## Patched testsuite issues

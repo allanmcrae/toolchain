@@ -16,9 +16,7 @@ The build order is:
 * binutils
 * gcc
 
-A helper script will be added in the future that will automate this build using Arch devtools. The build can take several hours depending on your hardware. Note there is no need to run the testsuite in the first pass of the build.
-
-*Due to libiberty move (see below) there is some manual steps currently needed to install the packages into the build root.*
+A helper script is available that automates this build using Arch devtools. The build can take several hours depending on your hardware. Note there is no need to run the testsuite in the first pass of the build.
 
 Alternatively, I will build these around once per month (or as necessary due to changes in Arch) and you can download the packages directly from my repository.  Add the following to your pacman.conf file, above all other repositories.
 
@@ -56,14 +54,6 @@ Usually these builds will follow the latest release branch, but will occasionall
 **No systemtap support**
 
 The Arch glibc package pulls systemtap support by importing headers from systemtap into the glibc package.  I disagree with this approach.  Instead the systemtap package should be added as a dependency to glibc.  As I have no interest in systemtap, I will not provide a systemtap package just to build glibc with systemtap support.
-
-**Libiberty provided by binutils**
-
-The libiberty files were moved to the Arch gcc package about a decade ago on a temporary basis due to a bug in the binutils version.  This was never reverted. 
-
-**No libcrypt compatibility library**
-
-The legacy libcrypt.so.1 library is not provided by glibc.
 
 ## Known Issues
 

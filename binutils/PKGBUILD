@@ -2,7 +2,7 @@
 
 pkgname=binutils
 pkgver=2.38
-pkgrel=3
+pkgrel=4.0
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=('x86_64')
 url='https://www.gnu.org/software/binutils/'
@@ -67,6 +67,9 @@ check() {
 package() {
   cd binutils-build
   make -j1 prefix="$pkgdir/usr" tooldir="$pkgdir/usr" install
+
+  # install PIC version of libiberty
+  install -m644 "$srcdir"/binutils-build/libiberty/pic/libiberty.a "$pkgdir"/usr/lib
 
   # Remove unwanted files
   rm -f "$pkgdir"/usr/share/man/man1/{dlltool,windres,windmc}*

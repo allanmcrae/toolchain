@@ -102,6 +102,7 @@ FAIL: gcc.target/i386/mvc7.c scan-assembler foo.default,
 
 ### Upstream regression #1
 https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583608.html
+
 https://gcc.gnu.org/pipermail/gcc-patches/2021-November/584190.html
 ```
 FAIL: gfortran.dg/vector_subscript_1.f90   -O1  execution test
@@ -128,13 +129,6 @@ FAIL: gcc.dg/deprecated.c (test for excess errors)
 https://gcc.gnu.org/pipermail/gcc-patches/2022-February/590443.html
 ```
 FAIL: gcc.target/i386/auto-init-4.c scan-assembler-times long\\t-16843010 5
-```
-
-### Upstream regression #5
-Needs investigating
-```
-FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 80)
-FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 84)
 ```
 
 ## Patched testsuite issues

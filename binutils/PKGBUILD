@@ -32,7 +32,6 @@ build() {
     --enable-gold \
     --enable-install-libiberty \
     --enable-ld=default \
-    --enable-lto \
     --enable-plugins \
     --enable-relro \
     --enable-shared \

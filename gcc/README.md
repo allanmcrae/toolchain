@@ -119,16 +119,29 @@ FAIL: gfortran.dg/unlimited_polymorphic_3.f03   -Os  execution test
 ```
 
 ### Upstream regression #3
-https://gcc.gnu.org/pipermail/gcc-patches/2022-February/590571.html
-```
-FAIL: gcc.dg/deprecated.c  (test for warnings, line 28)
-FAIL: gcc.dg/deprecated.c (test for excess errors)
-```
-
-### Upstream regression #4
 https://gcc.gnu.org/pipermail/gcc-patches/2022-February/590443.html
 ```
 FAIL: gcc.target/i386/auto-init-4.c scan-assembler-times long\\t-16843010 5
+```
+
+### Upstream regression #4
+Needs investigating
+```
+FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 80)
+FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 84)
+```
+
+### Upstream regression #5
+Needs investigating
+```
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
 ```
 
 ## Patched testsuite issues

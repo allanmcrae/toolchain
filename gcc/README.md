@@ -125,13 +125,20 @@ FAIL: gcc.target/i386/auto-init-4.c scan-assembler-times long\\t-16843010 5
 ```
 
 ### Upstream regression #4
+https://gcc.gnu.org/pipermail/gcc-patches/2022-March/591925.html
+```
+FAIL: gcc.target/i386/bt-5.c scan-assembler-not sar[lq][ \\t]
+FAIL: gcc.target/i386/bt-5.c scan-assembler-times bt[lq][ \\t] 7
+```
+
+### Upstream regression #5
 Needs investigating
 ```
 FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 80)
 FAIL: g++.dg/cpp23/consteval-if2.C  -std=gnu++20  (test for errors, line 84)
 ```
 
-### Upstream regression #5
+### Upstream regression #6
 Needs investigating
 ```
 XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (internal compiler error)
@@ -142,6 +149,13 @@ XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (internal
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (test for excess errors)
 XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal compiler error)
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
+```
+
+### Upstream regression #7
+Needs investigating
+```
+FAIL: gcc.target/i386/mvc7.c scan-assembler foo.avx,
+FAIL: gcc.target/i386/mvc7.c scan-assembler foo.default,
 ```
 
 ## Patched testsuite issues

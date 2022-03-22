@@ -1,14 +1,15 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
 pkgname=linux-api-headers
-pkgver=5.16.y
-pkgrel=4.0
+pkgver=5.17.y
+pkgrel=1.0
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=('any')
 url='https://www.gnu.org/software/libc'
 license=('GPL2')
 makedepends=('rsync' 'git')
-source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
+#source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git")
 sha256sums=('SKIP')
 
 build() {

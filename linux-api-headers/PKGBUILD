@@ -8,8 +8,7 @@ arch=('any')
 url='https://www.gnu.org/software/libc'
 license=('GPL2')
 makedepends=('rsync' 'git')
-#source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
-source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git")
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git#branch=linux-$pkgver")
 sha256sums=('SKIP')
 
 build() {

@@ -2,7 +2,7 @@
 
 pkgname=binutils
 pkgver=2.38
-pkgrel=5.0
+pkgrel=6.0
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=('x86_64')
 url='https://www.gnu.org/software/binutils/'
@@ -32,6 +32,7 @@ build() {
     --enable-gold \
     --enable-install-libiberty \
     --enable-ld=default \
+    --enable-pgo-build=lto \
     --enable-plugins \
     --enable-relro \
     --enable-shared \

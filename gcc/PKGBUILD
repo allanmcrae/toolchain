@@ -1,10 +1,10 @@
 # Maintainer: Allan McRae <allan@archlinux.org>
 
 pkgname=gcc
-pkgver=12.0.1
+pkgver=12.1.1
 _majorver=${pkgver%%.*}
 _islver=0.24
-pkgrel=0.7
+pkgrel=1.0
 pkgdesc='The GNU Compiler Collection'
 arch=('x86_64')
 license=('GPL' 'LGPL' 'FDL' 'custom')
@@ -17,8 +17,7 @@ provides=("gcc-libs=$pkgver" "gcc-fortran=$pkgver")
 conflicts=('gcc-libs' 'gcc-fortran')
 replaces=('gcc-libs' 'gcc-fortran')
 options=('!emptydirs' 'staticlibs' '!lto')
-#source=("git+https://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
-source=("git+https://gcc.gnu.org/git/gcc.git"
+source=("git+https://gcc.gnu.org/git/gcc.git#branch=releases/gcc-$_majorver"
         'c89'
         'c99'
         'fix-testsuite-default-pie.diff')

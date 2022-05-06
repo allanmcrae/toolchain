@@ -101,25 +101,7 @@ FAIL: gcc.target/i386/mvc7.c scan-assembler foo.default,
 ```
 
 ### Upstream regression #1
-https://gcc.gnu.org/pipermail/gcc-patches/2021-November/583608.html
-
-https://gcc.gnu.org/pipermail/gcc-patches/2021-November/584190.html
-```
-FAIL: gfortran.dg/vector_subscript_1.f90   -O1  execution test
-FAIL: gfortran.dg/vector_subscript_1.f90   -O2  execution test
-FAIL: gfortran.dg/vector_subscript_1.f90   -O3 -fomit-frame-pointer -funroll-loops -fpeel-loops -ftracer -finline-functions  execution test
-FAIL: gfortran.dg/vector_subscript_1.f90   -O3 -g  execution test
-FAIL: gfortran.dg/vector_subscript_1.f90   -Os  execution test
-```
-
-### Upstream regression #2
-https://gcc.gnu.org/pipermail/gcc-patches/2021-December/586851.html
-```
-FAIL: gfortran.dg/unlimited_polymorphic_3.f03   -Os  execution test
-```
-
-### Upstream regression #3
-Needs investigating
+Needs investigating (check if SSP or PIE related)
 ```
 XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (internal compiler error)
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (test for excess errors)
@@ -129,12 +111,6 @@ XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (internal
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (test for excess errors)
 XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal compiler error)
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
-```
-
-### Upstream regression #4
-Needs investigating
-```
-FAIL: gcc.dg/cpp/_Pragma3.c (test for excess errors)
 ```
 
 ## Patched testsuite issues

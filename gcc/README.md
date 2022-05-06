@@ -1,8 +1,59 @@
 # GCC testsuite failures
 
+## Unpatched testsuite issues
+
+### Failures due to default SSP
+
+I missed this one when patching PR70150...
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
+
+Configuring GCC with --enable-default-ssp results in these failures:
+```
+FAIL: gcc.target/i386/mvc7.c scan-assembler foo.avx,
+FAIL: gcc.target/i386/mvc7.c scan-assembler foo.default,
+```
+
+### Upstream regression #1
+
+Apparently due to building without --enable-checking
+
+https://gcc.gnu.org/pipermail/gcc/2022-May/238633.html
+```
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (test for excess errors)
+XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal compiler error)
+FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
+```
+
+## Patched testsuite issues
+
+### Failures due to default PIE
+
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
+TODO: submit patch to mailing list
+
+Configuring GCC with --enable-default-pie results in these failures:
+
+```
+FAIL: gcc.target/i386/cet-sjlj-6a.c scan-assembler-times movq\\t.*buf\\\\+8 1
+FAIL: gcc.target/i386/cet-sjlj-6a.c scan-assembler-times subq\\tbuf\\\\+8 1
+FAIL: gcc.target/i386/cet-sjlj-6b.c scan-assembler-times movq\\t.*buf\\\\+16 1
+FAIL: gcc.target/i386/cet-sjlj-6b.c scan-assembler-times subq\\tbuf\\\\+16 1
+FAIL: gcc.target/i386/fentryname3.c scan-assembler 0x0f, 0x1f, 0x44, 0x00, 0x00
+FAIL: gcc.target/i386/pr24414.c (test for excess errors)
+FAIL: gcc.target/i386/pr93492-3.c scan-assembler \\t.cfi_startproc\\n\\tendbr(32|64)\\n.*.LPFE1:\\n\\tnop\\n1:\\tcall\\t__fentry__\\n\\tret\\n
+FAIL: gcc.target/i386/pr93492-5.c scan-assembler \\t.cfi_startproc\\n.*.LPFE1:\\n\\tnop\\n1:\\tcall\\t__fentry__\\n\\tret\\n
+FAIL: gcc.target/i386/pr98482-1.c scan-assembler movabsq\\t\\\\\$__fentry__, %r10\\n\\tcall\\t\\\\*%r10
+```
+
 ## Buildflag failures
 
-These are failures in the GCC testsuite if we do not remove various Arch default build flags. It would be good to investigate these in more detail and ensure fixes are made (either here or upstream), or incompatibilities formally noted.
+These are additional failures in the GCC testsuite if we do not remove various Arch default build flags. It would be good to investigate these in more detail and ensure fixes are made (either here or upstream), or incompatibilities formally noted.
 
 ### Failure with -fexceptions
 
@@ -85,51 +136,4 @@ FAIL: 29_atomics/atomic/65913.cc (test for excess errors)
 FAIL: experimental/filesystem/path/preferred_separator.cc (test for excess errors)
 FAIL: experimental/names.cc (test for excess errors)
 FAIL: ext/random/hypergeometric_distribution/pr60037.cc (test for excess errors)
-```
-
-## Unpatched testsuite issues
-
-### Failures due to default SSP
-
-I missed this one when patching PR70150...
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
-
-Configuring GCC with --enable-default-ssp results in these failures:
-```
-FAIL: gcc.target/i386/mvc7.c scan-assembler foo.avx,
-FAIL: gcc.target/i386/mvc7.c scan-assembler foo.default,
-```
-
-### Upstream regression #1
-Needs investigating (check if SSP or PIE related)
-```
-XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (internal compiler error)
-FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++14 (test for excess errors)
-XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (internal compiler error)
-FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++17 (test for excess errors)
-XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (internal compiler error)
-FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++20 (test for excess errors)
-XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal compiler error)
-FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
-```
-
-## Patched testsuite issues
-
-### Failures due to default PIE
-
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
-TODO: submit patch to mailing list
-
-Configuring GCC with --enable-default-pie results in these failures:
-
-```
-FAIL: gcc.target/i386/cet-sjlj-6a.c scan-assembler-times movq\\t.*buf\\\\+8 1
-FAIL: gcc.target/i386/cet-sjlj-6a.c scan-assembler-times subq\\tbuf\\\\+8 1
-FAIL: gcc.target/i386/cet-sjlj-6b.c scan-assembler-times movq\\t.*buf\\\\+16 1
-FAIL: gcc.target/i386/cet-sjlj-6b.c scan-assembler-times subq\\tbuf\\\\+16 1
-FAIL: gcc.target/i386/fentryname3.c scan-assembler 0x0f, 0x1f, 0x44, 0x00, 0x00
-FAIL: gcc.target/i386/pr24414.c (test for excess errors)
-FAIL: gcc.target/i386/pr93492-3.c scan-assembler \\t.cfi_startproc\\n\\tendbr(32|64)\\n.*.LPFE1:\\n\\tnop\\n1:\\tcall\\t__fentry__\\n\\tret\\n
-FAIL: gcc.target/i386/pr93492-5.c scan-assembler \\t.cfi_startproc\\n.*.LPFE1:\\n\\tnop\\n1:\\tcall\\t__fentry__\\n\\tret\\n
-FAIL: gcc.target/i386/pr98482-1.c scan-assembler movabsq\\t\\\\\$__fentry__, %r10\\n\\tcall\\t\\\\*%r10
 ```

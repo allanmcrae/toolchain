@@ -55,6 +55,10 @@ Usually these builds will follow the latest release branch, but will occasionall
 
 The Arch glibc package pulls systemtap support by importing headers from systemtap into the glibc package.  I disagree with this approach.  Instead the systemtap package should be added as a dependency to glibc.  As I have no interest in systemtap, I will not provide a systemtap package just to build glibc with systemtap support.
 
+**No debuginfod supoprt**
+
+The glibc package is now completely stripped following the Arch package.  Arch provides needed symbols for valgrind (and gdb?) to run via debuginfod.  You can install the need glibc-debug package directly from this repo.
+
 ## Known Issues
 
 Some of the [new buildflags](https://gitlab.archlinux.org/archlinux/rfcs/-/blob/master/rfcs/0003-buildflags.rst) cause (false positive) testsuite failures in gcc.  These are currently disabled completely, but should only be disabled during the check() phase.

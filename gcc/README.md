@@ -30,6 +30,15 @@ XPASS: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (internal
 FAIL: c-c++-common/goacc/kernels-decompose-pr100400-1-2.c  -std=c++98 (test for excess errors)
 ```
 
+### Regression #2
+
+Investigate - possibly a SSP/PIE default issue
+
+```
+FAIL: 19_diagnostics/stacktrace/entry.cc execution test
+FAIL: 19_diagnostics/stacktrace/stacktrace.cc execution test
+```
+
 ## Patched testsuite issues
 
 ### Failures due to default PIE

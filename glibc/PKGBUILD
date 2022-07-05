@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.35
-pkgrel=9.0
+pkgrel=10.0
 pkgdesc='GNU C Library'
 arch=('x86_64')
 url='https://www.gnu.org/software/libc'
@@ -118,4 +118,5 @@ package() {
   install -m644 "$srcdir"/locale.gen.txt "$pkgdir"/etc/locale.gen
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
     glibc/localedata/SUPPORTED >> "$pkgdir"/etc/locale.gen
+  sed -i "s/#C.UTF-8/C.UTF-8/" "$pkgdir"/etc/locale.gen
 }

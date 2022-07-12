@@ -4,9 +4,9 @@
 
 ### Failures due to default SSP
 
-I missed this one when patching PR70150...
+I missed this one when patching PR70230...
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70150
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70230
 
 Configuring GCC with --enable-default-ssp results in these failures:
 ```

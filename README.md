@@ -1,6 +1,11 @@
 # Alternative Arch Linux Toolchain
 (As packaged in a very opinionated way by Allan)
 
+## DISCONTINUED ##
+
+As of August 2022, I am no longer updating these toolchain packages.  
+
+
 ## Overview
 
 These packages provide an alternative packaging of the toolchain (linux-api-headers, glibc, gcc and binutils) for Arch Linux.  See below for the key differences and potential problems. 

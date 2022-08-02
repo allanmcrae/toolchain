@@ -49,7 +49,7 @@ No-one really needs those languages anyway.
 **All sources from git branch**
 
 This toolchain always builds from the head of the relevant git branch.  This means there is no (or at least very little) need for backporting patches.
-Usually these builds will follow the latest release branch, but will occasionally use the development branch in the period leading up to release.
+Usually these builds will follow the latest release branch, but will use the development branch in the period leading up to release.
 
 **No systemtap support**
 
@@ -58,6 +58,10 @@ The Arch glibc package pulls systemtap support by importing headers from systemt
 **No debuginfod support**
 
 The glibc package is now completely stripped following the Arch package.  Arch provides needed symbols for valgrind (and gdb?) to run via debuginfod.  You can install the need glibc-debug package directly from this repo.
+
+**C.UTF-8 locale not built-in to glibc**
+
+The Arch package builds the C.UTF-8 an includes it in the package.  I have taken the approach of enabling it by default in the locale.gen configuration file.
 
 ## Known Issues
 
